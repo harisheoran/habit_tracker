@@ -27,7 +27,7 @@ func main() {
 
 	router.HandleFunc("/", rootHandler)
 
-	router.HandleFunc("/habits", func(w http.ResponseWriter, req *http.Request) {
+	router.HandleFunc("/create", func(w http.ResponseWriter, req *http.Request) {
 
 		mytemplate := "ui/main.gohtml"
 
@@ -55,11 +55,28 @@ func main() {
 			} else {
 				log.Println("Saved to DB")
 			}
-
 		}
 
 		template.Execute(w, "")
 
+	})
+
+	router.HandleFunc("/habits", func(w http.ResponseWriter, r *http.Request) {
+		var data = []Habit{}
+
+		myTemplate := "ui/app.gohtml"
+
+		template, err := template.ParseFiles(myTemplate)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		result := db.Find(&data)
+		if result.Error != nil {
+			log.Fatal(result.Error)
+		}
+
+		template.Execute(w, data)
 	})
 
 	// start the web server
